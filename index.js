@@ -287,9 +287,30 @@ NodeP4.prototype.users = function (options, callback) {
   });
 };
 
+NodeP4.prototype.sync = function (options, callback) {
+  if(typeof options === 'function') {
+    callback = options;
+    options = undefined;
+  }
+  execP4('-s sync', options, function (err, stdout) {
+    var result;
+    if (err) return callback(err);
+
+    // process each file
+    result = stdout.trim().split(/\r\n\r\n|\n\n/).reduce(function(memo, fileinfo) {
+      // process each line of file info, transforming into a hash
+      memo.push(processZtagOutput(fileinfo));
+      return memo;
+    }, []);
+
+    callback(null, result);
+  });
+};
+
 var commonCommands = ['add', 'delete', 'edit', 'revert', 'sync',
                       'diff', 'reconcile', 'reopen', 'resolved',
-                      'shelve', 'unshelve', 'client', 'resolve', 'submit'];
+                      'shelve', 'unshelve', 'client', 'resolve',
+                      'submit', 'sync'];
 commonCommands.forEach(function (command) {
   NodeP4.prototype[command] = function (options, callback) {
     execP4(command, options, callback);

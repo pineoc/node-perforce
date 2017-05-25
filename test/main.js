@@ -81,4 +81,17 @@ describe('node-perforce', function () {
       });
     });
   });
+
+  describe('sync', function () {
+    it('should sync file', function (done) {
+      p4.sync({files: ['..']}, function (err) {
+        if (err) return done(err);
+        p4.sync({ files: ['..']}, function (err) {
+          assert.ifError(err === undefined);
+          done();
+        });
+      });
+    });
+  });
+
 });
