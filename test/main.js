@@ -94,4 +94,15 @@ describe('node-perforce', function () {
     });
   });
 
+  describe('where', function () {
+    it('should where file', function (done) {
+      p4.sync({files: ['..']}, function (err) {
+        if (err) return done(err);
+        p4.sync({ files: ['..']}, function (err) {
+          assert.ifError(err === undefined);
+          done();
+        });
+      });
+    });
+  });
 });

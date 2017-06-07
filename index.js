@@ -294,7 +294,7 @@ NodeP4.prototype.sync = function(options, callback) {
   }
   execP4('sync', optionsz, function() {
     var result;
-    if (err) return(err);
+    if (err) return callback(err);
 
     // process each file
     stdout.trim().split(/\r\n\r\n|\n\n/).reduce(function(memo, fileinfo) {
@@ -302,6 +302,7 @@ NodeP4.prototype.sync = function(options, callback) {
       memo.push(processZtagOutput(fileinfo));
       return memo;
     }, []);
+    callback(null, result);
   });
 };
 NodeP4.prototype.where = function(options, callback) {
@@ -311,7 +312,7 @@ NodeP4.prototype.where = function(options, callback) {
   }
   execP4('where', optionsz, function() {
     var result;
-    if (err) return(err);
+    if (err) return callback(err);
 
     // process each file
     stdout.trim().split(/\r\n\r\n|\n\n/).reduce(function(memo, fileinfo) {
@@ -319,6 +320,7 @@ NodeP4.prototype.where = function(options, callback) {
       memo.push(processZtagOutput(fileinfo));
       return memo;
     }, []);
+    callback(null, result);
   });
 };
 
