@@ -6,13 +6,17 @@ var exec = require('child_process').exec;
 var p4options = require('./p4options');
 var ztagRegex = /^\.\.\.\s+(\w+)\s+(.+)/;
 
-var p4 = process.platform === 'win32'? 'p4.exe' : 'p4';
+var p4 = process.platform === 'win32' ? 'p4.exe' : 'p4';
 
 // build a list of options/arguments for the p4 command
 function optionBuilder(options) {
   options = options || {};
 
-  var results = {stdin: [], args: [], files: []};
+  var results = {
+    stdin: [],
+    args: [],
+    files: []
+  };
   Object.keys(options).map(function (option) {
     var p4option = p4options[option];
     if (!p4option) return;
@@ -36,21 +40,21 @@ function optionBuilder(options) {
 // (i.e., not p4 command arguments)
 function execOptionBuilder(options) {
   var validKeys = {
-    cwd:        true,
-    env:        true,
-    encoding:   true,
-    shell:      true,
-    timeout:    true,
-    maxBuffer:  true,
+    cwd: true,
+    env: true,
+    encoding: true,
+    shell: true,
+    timeout: true,
+    maxBuffer: true,
     killSignal: true,
-    uid:        true,
-    gid:        true
+    uid: true,
+    gid: true
   };
 
   options = options || {};
 
-  return Object.keys(options).reduce(function(result, key) {
-    if(validKeys[key]) {
+  return Object.keys(options).reduce(function (result, key) {
+    if (validKeys[key]) {
       result[key] = options[key];
     }
     return result;
@@ -81,15 +85,15 @@ function execP4(p4cmd, options, callback) {
 
 // process group of lines of output from a p4 command executed with -ztag
 function processZtagOutput(output) {
-  return output.split('\n').reduce(function(memo, line) {
+  return output.split('\n').reduce(function (memo, line) {
     var match, key, value;
-      match = ztagRegex.exec(line);
-      if(match) {
-        key = match[1];
-        value = match[2];
-        memo[key] = value;
-      }
-      return memo;
+    match = ztagRegex.exec(line);
+    if (match) {
+      key = match[1];
+      value = match[2];
+      memo[key] = value;
+    }
+    return memo;
   }, {});
 }
 
@@ -113,7 +117,7 @@ NodeP4.prototype.changelist = {
     });
   },
   edit: function (options, callback) {
-    callback = callback || function(){};
+    callback = callback || function () {};
     if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
     if (!options.description) return callback();
     var newOptions = {
@@ -126,16 +130,20 @@ NodeP4.prototype.changelist = {
     });
   },
   delete: function (options, callback) {
-    callback = callback || function(){};
+    callback = callback || function () {};
     if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
-    execP4('change', {_delete: options.changelist}, function (err) {
+    execP4('change', {
+      _delete: options.changelist
+    }, function (err) {
       if (err) return callback(err);
       return callback();
     });
   },
   view: function (options, callback) {
     if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
-    execP4('change', {_output: options.changelist}, function (err, stdout) {
+    execP4('change', {
+      _output: options.changelist
+    }, function (err, stdout) {
       if (err) return callback(err);
 
       // preprocessing file status
@@ -154,8 +162,11 @@ NodeP4.prototype.changelist = {
 
       if (result.files) {
         result.files = result.files.split('\n').map(function (file) {
-          var file = file.replace(/\t*/g, '').split('@@@');
-          return {file: file[0], action: file[1]};
+          var fileSplit = file.replace(/\t*/g, '').split('@@@');
+          return {
+            file: fileSplit[0],
+            action: fileSplit[1]
+          };
         });
       } else {
         result.files = [];
@@ -172,7 +183,7 @@ NodeP4.prototype.changelist = {
 };
 
 NodeP4.prototype.info = function (options, callback) {
-  if(typeof options === 'function') {
+  if (typeof options === 'function') {
     callback = options;
     options = undefined;
   }
@@ -192,7 +203,7 @@ NodeP4.prototype.info = function (options, callback) {
 
 // return an array of file info objects for each file opened in the workspace
 NodeP4.prototype.opened = function (options, callback) {
-  if(typeof options === 'function') {
+  if (typeof options === 'function') {
     callback = options;
     options = undefined;
   }
@@ -201,7 +212,7 @@ NodeP4.prototype.opened = function (options, callback) {
     if (err) return callback(err);
 
     // process each file
-    result = stdout.trim().split(/\r\n\r\n|\n\n/).reduce(function(memo, fileinfo) {
+    result = stdout.trim().split(/\r\n\r\n|\n\n/).reduce(function (memo, fileinfo) {
       // process each line of file info, transforming into a hash
       memo.push(processZtagOutput(fileinfo));
       return memo;
@@ -212,7 +223,7 @@ NodeP4.prototype.opened = function (options, callback) {
 };
 
 NodeP4.prototype.fstat = function (options, callback) {
-  if(typeof options === 'function') {
+  if (typeof options === 'function') {
     callback = options;
     options = undefined;
   }
@@ -221,7 +232,7 @@ NodeP4.prototype.fstat = function (options, callback) {
     if (err) return callback(err);
 
     // process each file fstat info
-    result = stdout.trim().split(/\r\n\r\n|\n\n/).reduce(function(memo, fstatinfo) {
+    result = stdout.trim().split(/\r\n\r\n|\n\n/).reduce(function (memo, fstatinfo) {
       // process each line of file info, transforming into a hash
       memo.push(processZtagOutput(fstatinfo));
       return memo;
@@ -232,7 +243,7 @@ NodeP4.prototype.fstat = function (options, callback) {
 }
 
 NodeP4.prototype.changes = function (options, callback) {
-  if(typeof options === 'function') {
+  if (typeof options === 'function') {
     callback = options;
     options = undefined;
   }
@@ -241,7 +252,7 @@ NodeP4.prototype.changes = function (options, callback) {
     if (err) return callback(err);
 
     // process each change
-    result = stdout.trim().split(/\r\n\r\n|\n\n(?=\.\.\.)/).reduce(function(memo, changeinfo) {
+    result = stdout.trim().split(/\r\n\r\n|\n\n(?=\.\.\.)/).reduce(function (memo, changeinfo) {
       // process each line of change info, transforming into a hash
       memo.push(processZtagOutput(changeinfo));
       return memo;
@@ -252,7 +263,7 @@ NodeP4.prototype.changes = function (options, callback) {
 };
 
 NodeP4.prototype.user = function (options, callback) {
-  if(typeof options === 'function') {
+  if (typeof options === 'function') {
     callback = options;
     options = undefined;
   }
@@ -268,7 +279,7 @@ NodeP4.prototype.user = function (options, callback) {
 };
 
 NodeP4.prototype.users = function (options, callback) {
-  if(typeof options === 'function') {
+  if (typeof options === 'function') {
     callback = options;
     options = undefined;
   }
@@ -277,7 +288,7 @@ NodeP4.prototype.users = function (options, callback) {
     if (err) return callback(err);
 
     // process each change
-    result = stdout.trim().split(/\r\n\r\n|\n\n(?=\.\.\.)/).reduce(function(memo, userinfo) {
+    result = stdout.trim().split(/\r\n\r\n|\n\n(?=\.\.\.)/).reduce(function (memo, userinfo) {
       // process each line of user info, transforming into a hash
       memo.push(processZtagOutput(userinfo));
       return memo;
@@ -287,9 +298,10 @@ NodeP4.prototype.users = function (options, callback) {
   });
 };
 var commonCommands = ['add', 'delete', 'edit', 'revert', 'sync',
-                      'diff', 'reconcile', 'reopen', 'resolved',
-                      'shelve', 'unshelve', 'client', 'resolve',
-                      'submit', 'where', 'files', 'describe'];
+  'diff', 'reconcile', 'reopen', 'resolved',
+  'shelve', 'unshelve', 'client', 'resolve',
+  'submit', 'where', 'files', 'describe'
+];
 commonCommands.forEach(function (command) {
   NodeP4.prototype[command] = function (options, callback) {
     execP4(command, options, callback);
