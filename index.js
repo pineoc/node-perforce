@@ -297,6 +297,11 @@ NodeP4.prototype.users = function (options, callback) {
     callback(null, result);
   });
 };
+
+NodeP4.prototype.describe = function (options, callback) {
+
+};
+
 var commonCommands = ['add', 'delete', 'edit', 'revert', 'sync',
   'diff', 'reconcile', 'reopen', 'resolved',
   'shelve', 'unshelve', 'client', 'resolve',

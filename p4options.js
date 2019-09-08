@@ -97,6 +97,10 @@ module.exports = {
     type: String,
     category: 'mixed'
   },
+  shortened: {
+    cmd: '-s',
+    category: 'unary'
+  },
   custom: {
     cmd: ' ',
     type: String,
