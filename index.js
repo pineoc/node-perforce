@@ -133,7 +133,7 @@ NodeP4.prototype.changelist = {
     callback = callback || function () {};
     if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
     execP4('change', {
-      _delete: options.changelist
+      _delete: options.changelist.toString()
     }, function (err) {
       if (err) return callback(err);
       return callback();
@@ -142,7 +142,7 @@ NodeP4.prototype.changelist = {
   view: function (options, callback) {
     if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
     execP4('change', {
-      _output: options.changelist
+      _output: options.changelist.toString()
     }, function (err, stdout) {
       if (err) return callback(err);
 

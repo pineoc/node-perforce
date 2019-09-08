@@ -23,10 +23,10 @@
   },
   "homepage": "https://github.com/joeback71/node-perforce",
   "dependencies": {
-    "string": "^2.2.0"
+    "string": "^3.3.3"
   },
   "devDependencies": {
-    "mocha": "^2.0.1",
-    "should": "^4.1.0"
+    "mocha": "^6.2.0",
+    "should": "^13.2.3"
   }
 }

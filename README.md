@@ -14,6 +14,12 @@ npm install node-perforce --save
 ```js
 var p4 = require('node-perforce');
 
+// show p4 infos
+p4.info(function (err, info) {
+  if (err) return console.log(err);
+  console.log(info);
+});
+
 // create a new changelist
 p4.changelist.create({description: 'hello world'}, function (err, changelist) {
   if (err) return console.log(err);
@@ -49,5 +55,11 @@ p4.revert({files: ['*.bin']}, function(err) {
 // edit files
 p4.edit({files: ['*.js']}, function(err) {
   if (err) return console.log(err);
+});
+
+// show changes
+p4.changes({time: true, max: 10, long: true}, function (err, result) {
+  if (err) return console.log(err);
+  console.log(result);
 });
 ```
