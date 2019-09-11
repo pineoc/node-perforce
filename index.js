@@ -94,7 +94,7 @@ function processZtagOutput(output) {
       memo[key] = value;
     }
     // if desc has \n char, concat datas
-    if (memo['desc'] && line) {
+    if (memo['desc'] && line && line.indexOf('... desc') === -1) {
       memo['desc'] += '\n' + line;
     }
     return memo;
