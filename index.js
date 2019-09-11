@@ -93,6 +93,10 @@ function processZtagOutput(output) {
       value = match[2];
       memo[key] = value;
     }
+    // if desc has \n char, concat datas
+    if (memo['desc'] && line) {
+      memo['desc'] += '\n' + line;
+    }
     return memo;
   }, {});
 }
