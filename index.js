@@ -93,7 +93,7 @@ function processZtagOutput(output) {
       value = match[2];
       memo[key] = value;
     }
-    // if desc has \n char, concat datas
+    // if desc has \n char, concat desc datas
     if (memo['desc'] && line && line.indexOf('... desc') === -1) {
       memo['desc'] += '\n' + line;
     }
@@ -182,6 +182,7 @@ NodeP4.prototype.changelist = {
     if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
     execP4('submit', options, function (err, stdout) {
       if (err) return callback(err);
+      return callback(null, stdout);
     });
   }
 };
@@ -319,7 +320,13 @@ NodeP4.prototype.describe = function (options, callback) {
       memo.push(processZtagOutput(userinfo));
       return memo;
     }, []);
-    return callback(null, result);
+    // merge {desc + file changes}
+    var mergedResults = [];
+    for (let i = 0, len = result.length; i <= len / 2; i += 2) {
+      let mergedRes = Object.assign(result[i], result[i + 1]);
+      mergedResults.push(mergedRes);
+    }
+    return callback(null, mergedResults);
   });
 };
 

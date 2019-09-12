@@ -1,12 +1,12 @@
 node-perforce
 =============
 
-A simple library for perforce
+A simple node library for perforce
 
 ## Install
 
 ```sh
-npm install node-perforce --save
+$ npm install node-perforce --save
 ```
 
 ## Example
@@ -61,5 +61,11 @@ p4.edit({files: ['*.js']}, function(err) {
 p4.changes({time: true, max: 10, long: true}, function (err, result) {
   if (err) return console.log(err);
   console.log(result);
+});
+
+// show changelist detail - describe
+p4.describe({shortened: true, changelist: 1}, function (err, info) {
+  if (err) return console.log(err);
+  console.log(info);
 });
 ```

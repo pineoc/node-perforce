@@ -15,9 +15,7 @@ var testFixturesPath = function (glob) {
 };
 
 describe('node-perforce', function () {
-  
   var changelist = 0;
-  var clientName;
   var clientRoot;
   describe('info', function () {
     it('Should output p4 info', function (done) {
@@ -26,7 +24,6 @@ describe('node-perforce', function () {
         var keys = Object.keys(info);
         assert.notEqual(keys.indexOf('userName'), -1);
         clientRoot = info.clientRoot;
-        clientName = info.clientName;
         done();
       });
     });
@@ -128,10 +125,18 @@ describe('node-perforce', function () {
         done();
       });
     });
+    it('Should be able to get multiple changes list', function (done) {
+      p4.changes({max: 3}, function (err, result) {
+        assert.ifError(err);
+        assert.ok(result.length <= 3);
+        assert.ok(result[0].change);
+        done();
+      })
+    });
   });
 
   describe('describe', function () {
-    it('Should desribe of changelist exist', function(done) {
+    it('Should describe of changelist exist', function(done) {
       p4.describe({changelist: 1}, function (err, result) {
         assert.ifError(err);
         assert.ok(result);
