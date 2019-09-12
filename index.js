@@ -307,9 +307,8 @@ NodeP4.prototype.describe = function (options, callback) {
   // make options
   var newOptions = {
     shortened: options.shortened ? true : false,
-    _changelist: options.changelist
+    _changelist: options.changelist.toString()
   };
-  console.log(newOptions, options);
 
   execP4('-ztag describe', newOptions, function (err, stdout) {
     if (err) return callback(err);

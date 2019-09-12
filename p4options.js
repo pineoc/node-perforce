@@ -98,8 +98,8 @@ module.exports = {
     category: 'mixed'
   },
   _changelist: {
-    cmd: '',
-    type: Number,
+    cmd: ' ',
+    type: String,
     category: 'mixed'
   },
   shortened: {
