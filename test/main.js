@@ -6,7 +6,9 @@ var assert = require('assert');
 var path = require('path');
 require('mocha');
 
-var fixtures = function (glob) { return path.join(__dirname, 'fixtures', glob); };
+var fixtures = function (glob) {
+  return path.join(__dirname, 'fixtures', glob);
+};
 
 describe('node-perforce', function () {
   describe('info', function () {

@@ -97,8 +97,17 @@ module.exports = {
     type: String,
     category: 'mixed'
   },
+  _changelist: {
+    cmd: '',
+    type: Number,
+    category: 'mixed'
+  },
   shortened: {
     cmd: '-s',
+    category: 'unary'
+  },
+  original: {
+    cmd: '-O',
     category: 'unary'
   },
   custom: {
