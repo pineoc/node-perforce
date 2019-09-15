@@ -1,7 +1,7 @@
 node-perforce
 =============
 
-A simple node library for perforce
+A simple Node library for perforce
 
 ## Install
 
