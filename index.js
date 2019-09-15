@@ -306,10 +306,8 @@ NodeP4.prototype.users = function (options, callback) {
 NodeP4.prototype.describe = function (options, callback) {
   if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
   // make options
-  var newOptions = {
-    shortened: options.shortened ? true : false,
-    _changelist: options.changelist.toString()
-  };
+  var newOptions = Object.assign(options, {_changelist: options.changelist.toString()});
+  delete newOptions['changelist'];
 
   execP4('-ztag describe', newOptions, function (err, stdout) {
     if (err) return callback(err);

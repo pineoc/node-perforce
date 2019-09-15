@@ -97,17 +97,22 @@ module.exports = {
     type: String,
     category: 'mixed'
   },
+  // describe changelist option
   _changelist: {
     cmd: ' ',
     type: String,
     category: 'mixed'
   },
-  shortened: {
-    cmd: '-s',
+  identity: {
+    cmd: '-I',
     category: 'unary'
   },
   original: {
     cmd: '-O',
+    category: 'unary'
+  },
+  shortened: {
+    cmd: '-s',
     category: 'unary'
   },
   custom: {
