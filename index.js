@@ -93,7 +93,7 @@ function processZtagOutput(output) {
       value = match[2];
       memo[key] = value;
     }
-    // if desc has \n char, concat datas
+    // if desc has \n char, concat desc datas
     if (memo['desc'] && line && line.indexOf('... desc') === -1) {
       memo['desc'] += '\n' + line;
     }
@@ -182,6 +182,7 @@ NodeP4.prototype.changelist = {
     if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
     execP4('submit', options, function (err, stdout) {
       if (err) return callback(err);
+      return callback(null, stdout);
     });
   }
 };
@@ -256,7 +257,7 @@ NodeP4.prototype.changes = function (options, callback) {
     if (err) return callback(err);
 
     // process each change
-    result = stdout.trim().split(/\r\n\r\n|\n\n(?=\.\.\.)/).reduce(function (memo, changeinfo) {
+    result = stdout.trim().split(/\r\n\r\n(?=\.\.\.)|\n\n(?=\.\.\.)/).reduce(function (memo, changeinfo) {
       // process each line of change info, transforming into a hash
       memo.push(processZtagOutput(changeinfo));
       return memo;
@@ -301,10 +302,36 @@ NodeP4.prototype.users = function (options, callback) {
     callback(null, result);
   });
 };
+
+NodeP4.prototype.describe = function (options, callback) {
+  if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
+  // make options
+  var newOptions = Object.assign(options, {_changelist: options.changelist.toString()});
+  delete newOptions['changelist'];
+
+  execP4('-ztag describe', newOptions, function (err, stdout) {
+    if (err) return callback(err);
+
+    // process each change
+    var result = stdout.trim().split(/\r\n\r\n(?=\.\.\.)|\n\n(?=\.\.\.)/).reduce(function (memo, userinfo) {
+      // process each line of user info, transforming into a hash
+      memo.push(processZtagOutput(userinfo));
+      return memo;
+    }, []);
+    // merge {desc + file changes}
+    var mergedResults = [];
+    for (let i = 0, len = result.length; i <= len / 2; i += 2) {
+      let mergedRes = Object.assign(result[i], result[i + 1]);
+      mergedResults.push(mergedRes);
+    }
+    return callback(null, mergedResults);
+  });
+};
+
 var commonCommands = ['add', 'delete', 'edit', 'revert', 'sync',
   'diff', 'reconcile', 'reopen', 'resolved',
   'shelve', 'unshelve', 'client', 'resolve',
-  'submit', 'where', 'files', 'describe'
+  'submit', 'where', 'files'
 ];
 commonCommands.forEach(function (command) {
   NodeP4.prototype[command] = function (options, callback) {

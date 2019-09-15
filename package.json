@@ -1,7 +1,7 @@
 {
   "name": "node-perforce",
-  "version": "0.0.19",
-  "description": "A simple library for perforce",
+  "version": "0.0.20",
+  "description": "A simple Node library for perforce",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
@@ -16,16 +16,19 @@
     "node-perforce",
     "node-p4"
   ],
-  "author": "joeback71 <catechimus@gmail.com>",
+  "author": "pineoc <kingsuk92@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/joebach71/node-perforce/issues"
+    "url": "https://github.com/pineoc/node-perforce/issues"
   },
-  "homepage": "https://github.com/joeback71/node-perforce",
+  "homepage": "https://github.com/pineoc/node-perforce",
   "dependencies": {
     "string": "^3.3.3"
   },
   "devDependencies": {
+    "eslint": "^6.3.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
     "mocha": "^6.2.0",
     "should": "^13.2.3"
   }

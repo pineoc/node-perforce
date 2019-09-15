@@ -4,52 +4,67 @@ var p4 = require('../');
 var should = require('should');
 var assert = require('assert');
 var path = require('path');
+var fs = require('fs');
 require('mocha');
 
-var fixtures = function (glob) { return path.join(__dirname, 'fixtures', glob); };
+var p4FixturesPath = function (p4Path, glob) {
+  return path.join(p4Path, glob);
+};
+var testFixturesPath = function (glob) {
+  return path.join(__dirname, 'fixtures', glob);
+};
 
 describe('node-perforce', function () {
+  var changelist = 0;
+  var clientRoot;
   describe('info', function () {
-    it('should output p4 info', function (done) {
+    it('Should output p4 info', function (done) {
       p4.info(function (err, info) {
-        if (err) return done(err);
+        assert.ifError(err);
         var keys = Object.keys(info);
         assert.notEqual(keys.indexOf('userName'), -1);
+        clientRoot = info.clientRoot;
         done();
       });
     });
   });
 
-  var changelist = 0;
   describe('changelist', function () {
-    it('should create a changelist', function (done) {
+    this.beforeAll('fixture file copy', function (done) {
+      fs.copyFileSync(testFixturesPath('one.js'), p4FixturesPath(clientRoot, 'one.js'));
+      fs.copyFileSync(testFixturesPath('two.json'), p4FixturesPath(clientRoot, 'two.json'));
+      done();
+    });
+
+    it('Should create a changelist', function (done) {
       p4.changelist.create({description: 'hello'}, function (err, cl) {
-        if (err) return done(err);
+        assert.ifError(err);
         changelist = cl;
         done();
       });
     });
-    it('should be named \'hello\'', function (done) {
+    it('Should be named \'hello\'', function (done) {
       p4.changelist.view({changelist: changelist}, function (err, view) {
-        if (err) return done(err);
+        assert.ifError(err);
         assert.equal('hello', view.description);
         done();
       });
     });
-    it('should modify description of changelist as \'world\'', function (done) {
+    it('Should modify description of changelist as \'world\'', function (done) {
       p4.changelist.edit({changelist: changelist, description: 'world'}, function (err) {
-        if (err) return done(err);
+        assert.ifError(err);
         p4.changelist.view({changelist: changelist}, function (err, view) {
-          if (err) return done(err);
+          assert.ifError(err);
           assert.equal(view.description, 'world');
           done();
         });
       });
     });
     describe('add and revert', function () {
-      it('should add files', function (done) {
-        p4.add({changelist:changelist, files: [fixtures('*')]}, function (err) {
-          if (err) return done(err);
+      it('Should add files', function (done) {
+        var files = [p4FixturesPath(clientRoot, 'one.js'), p4FixturesPath(clientRoot, 'two.json')]
+        p4.add({changelist:changelist, files: files}, function (err) {
+          assert.ifError(err);
           p4.changelist.view({changelist: changelist}, function (err, view) {
             if (err) return done(err);
             assert.equal(view.files.length, 2);
@@ -57,9 +72,10 @@ describe('node-perforce', function () {
           });
         });
       });
-      it('should revert files', function (done) {
-        p4.revert({changelist: changelist, files: [fixtures(('*'))]}, function (err) {
-          if (err) return done(err);
+      it('Should revert files', function (done) {
+        var files = [p4FixturesPath(clientRoot, 'one.js'), p4FixturesPath(clientRoot, 'two.json')]
+        p4.revert({changelist: changelist, files: files}, function (err) {
+          assert.ifError(err);
           p4.changelist.view({changelist: changelist}, function (err, view) {
             if (err) return done(err);
             assert.equal(view.files.length, 0);
@@ -71,11 +87,12 @@ describe('node-perforce', function () {
   });
 
   describe('cleanup', function () {
-    it('should delete changelist', function (done) {
+    it('Should delete changelist', function (done) {
       p4.changelist.delete({changelist: changelist}, function (err) {
-        if (err) return done(err);
+        assert.ifError(err);
         p4.changelist.view({changelist: changelist}, function (err) {
-          assert.ifError(err === undefined);
+          // view if error, delete success
+          assert.ok(err.toString().indexOf(`Change ${changelist} unknown`) !== -1);
           done();
         });
       });
@@ -83,25 +100,47 @@ describe('node-perforce', function () {
   });
 
   describe('sync', function () {
-    it('should sync file', function (done) {
-      p4.sync({files: ['..']}, function (err) {
-        if (err) return done(err);
-        p4.sync({ files: ['..']}, function (err) {
-          assert.ifError(err === undefined);
-          done();
-        });
+    it('Should sync file', function (done) {
+      p4.sync({files: [p4FixturesPath(clientRoot, '...')]}, function (err) {
+        assert.ok(err.toString().indexOf('up-to-date') !== -1);
+        done();
       });
     });
   });
 
   describe('where', function () {
-    it('should where file', function (done) {
-      p4.sync({files: ['..']}, function (err) {
-        if (err) return done(err);
-        p4.sync({ files: ['..']}, function (err) {
-          assert.ifError(err === undefined);
-          done();
-        });
+    it('Should where file', function (done) {
+      p4.where({files: [p4FixturesPath(clientRoot, 'one.js')]}, function (err) {
+        assert.ifError(err);
+        done();
+      });
+    });
+  });
+
+  describe('changes', function () {
+    it('Should changes list exist', function (done) {
+      p4.changes({max: 1}, function (err, result) {
+        assert.ifError(err);
+        assert.ok(result.length > 0);
+        done();
+      });
+    });
+    it('Should be able to get multiple changes list', function (done) {
+      p4.changes({max: 3}, function (err, result) {
+        assert.ifError(err);
+        assert.ok(result.length <= 3);
+        assert.ok(result[0].change);
+        done();
+      })
+    });
+  });
+
+  describe('describe', function () {
+    it('Should describe of changelist exist', function(done) {
+      p4.describe({changelist: 1}, function (err, result) {
+        assert.ifError(err);
+        assert.ok(result);
+        done();
       });
     });
   });
