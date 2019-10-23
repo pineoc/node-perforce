@@ -256,6 +256,8 @@ NodeP4.prototype.changes = function (options, callback) {
     var result;
     if (err) return callback(err);
 
+    // remove newlines on front
+    stdout = stdout.trimStart();
     // process each change
     result = stdout.trim().split(/\r\n\r\n(?=\.\.\.)|\n\n(?=\.\.\.)/).reduce(function (memo, changeinfo) {
       // process each line of change info, transforming into a hash
@@ -312,6 +314,8 @@ NodeP4.prototype.describe = function (options, callback) {
   execP4('-ztag describe', newOptions, function (err, stdout) {
     if (err) return callback(err);
 
+    // remove newlines on front
+    stdout = stdout.trimStart();
     // process each change
     var result = stdout.trim().split(/\r\n\r\n(?=\.\.\.)|\n\n(?=\.\.\.)/).reduce(function (memo, userinfo) {
       // process each line of user info, transforming into a hash
