@@ -103,7 +103,7 @@ function processZtagOutput(output) {
 
 function NodeP4() {}
 
-NodeP4.prototype.changelist = {
+NodeP4.prototype.change = {
   create: function (options, callback) {
     if (typeof options === 'function') {
       callback = options;
@@ -187,6 +187,9 @@ NodeP4.prototype.changelist = {
   }
 };
 
+// Alias p4 change command
+NodeP4.prototype.changelist = NodeP4.prototype.change;
+
 NodeP4.prototype.info = function (options, callback) {
   if (typeof options === 'function') {
     callback = options;
@@ -269,6 +272,9 @@ NodeP4.prototype.changes = function (options, callback) {
   });
 };
 
+// Alias p4 changes command
+NodeP4.prototype.changelists = NodeP4.prototype.changes;
+
 NodeP4.prototype.user = function (options, callback) {
   if (typeof options === 'function') {
     callback = options;
@@ -331,6 +337,14 @@ NodeP4.prototype.describe = function (options, callback) {
     return callback(null, mergedResults);
   });
 };
+
+NodeP4.prototype.submit = function (options, callback) {
+  if (!options || !options.changelist) return callback(new Error('Missing parameter/argument'));
+  execP4('submit', options, function (err, stdout) {
+    if (err) return callback(err);
+    return callback(null, stdout);
+  });
+}
 
 var commonCommands = ['add', 'delete', 'edit', 'revert', 'sync',
   'diff', 'reconcile', 'reopen', 'resolved',
