@@ -149,7 +149,7 @@ describe('node-perforce', function () {
 
   describe('submit - changelist', function () {
     it('Should submit changelist', function (done) {
-      p4.changelist.submit({changelist: changelist2}, function (err) {
+      p4.submit({changelist: changelist2}, function (err) {
         assert.ifError(err);
         p4.describe({changelist: changelist2}, function (err, result) {
           assert.ifError(err);
