@@ -346,6 +346,14 @@ NodeP4.prototype.describe = function (options, callback) {
 
 NodeP4.prototype.submit = NodeP4.prototype.change.submit;
 
+NodeP4.prototype.copy = function (options, callback) {
+
+};
+
+NodeP4.prototype.merge = function (options, callback) {
+
+};
+
 var commonCommands = ['add', 'delete', 'edit', 'revert', 'sync',
   'diff', 'reconcile', 'reopen', 'resolved',
   'shelve', 'unshelve', 'client', 'resolve',
