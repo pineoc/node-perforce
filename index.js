@@ -329,10 +329,16 @@ NodeP4.prototype.describe = function (options, callback) {
       return memo;
     }, []);
     // merge {desc + file changes}
+    // some CLs include 'Affected stream specification' and 'branch' 
     var mergedResults = [];
-    for (let i = 0, len = result.length; i <= len / 2; i += 2) {
-      let mergedRes = Object.assign(result[i], result[i + 1]);
-      mergedResults.push(mergedRes);
+    for (let i = 0, len = result.length; i < (len - 1); i += 1) {
+      if (('change' in result[i]) && 'status' in result[i + 1]) {
+        let mergedRes = Object.assign(result[i], result[i + 1]);
+        mergedResults.push(mergedRes);
+        i += 1; // skip next start changelist
+      } else {
+        mergedResults.push(result[i]);
+      }
     }
     return callback(null, mergedResults);
   });
